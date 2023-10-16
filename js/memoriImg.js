@@ -17,6 +17,13 @@ let mostarTiempo = document.getElementById('t-restantes')
 let tiempoRegresivo = null;
 let btn_iniciar = document.querySelector('.btn_iniciar');
 
+let winAudio = new Audio ('../sounds/coins.mp3');
+let jump = new Audio ('../sounds/jump.mp3');
+let interface = new Audio ('../sounds/interface.mp3');
+let perder = new Audio ('../sounds/perder.mp3');
+let success = new Audio ('../sounds/success.mp3');
+
+
 src="https://cdn.jsdelivr.net/npm/sweetalert2@11";
 
 let numbers = [1,1,2,2,3,3,4,4,5,5,6,6,7,7,8,8];
@@ -37,6 +44,7 @@ function contarTiempo(){
         if(timer == 0){
             clearInterval(tiempoRegresivo);
             bloquearTargetas();
+            perder.play();
             Swal.fire({
                 position: 'center',
                 icon: 'error',
@@ -51,7 +59,7 @@ function contarTiempo(){
 function bloquearTargetas(){
     for(let i=0; i<=15; i++){
         let tarjetaBloqueada = document.getElementById(i);
-        tarjetaBloqueada.innerHTML = numbers[i];
+        tarjetaBloqueada.innerHTML =`<img src="../images/animalesMarinos/${numbers[i]}.png" alt="">`;
         tarjetaBloqueada.disabled = true;        
     }
 }
@@ -59,26 +67,27 @@ function bloquearTargetas(){
 function destapar(id){
     if(temporizador == false){
         contarTiempo();
-        temporizador = true;
-        
+        temporizador = true;        
     }
 
 
-    targetOpen++;
-
-    if (targetOpen == 1){
+    if (targetOpen == 0){
         //muestra el primer nuemro
         targetOne = document.getElementById(id);
         oneResult = numbers[id];
-        targetOne.innerHTML = oneResult;
+        targetOne.innerHTML = `<img src="../images/animalesMarinos/${oneResult}.png" alt="">`;
+        success.play();
 
         //si el valor aparece se desabilita la tarjeta
         targetOne.disabled = true;
+        targetOpen++;
 
-    }else if(targetOpen == 2){//muestra el segundo numero
+
+    }else if(targetOpen == 1){//muestra el segundo numero
         targetTwo = document.getElementById(id);
         secundResult = numbers[id];
-        targetTwo.innerHTML = secundResult;
+        targetTwo.innerHTML = `<img src="../images/animalesMarinos/${secundResult}.png" alt="">`;
+        
 
         //se deshabilita la segunda tarjeta
         targetTwo.disabled= true;
@@ -93,14 +102,24 @@ function destapar(id){
             aciertos++;
             
             mostrarAcierto.innerHTML= `Aciertos: ${aciertos}`;
+            winAudio.play();
 
             if(aciertos == 8){
+                interface.play();
                 clearInterval(tiempoRegresivo);
                 mostrarAcierto.innerHTML = `Aciertos: ${aciertos}`;
                 mostarTiempo.innerHTML = `Genial! solo Tardaste: ${timerInicial - timer} segundos`;
                 mostrarMovimientos.innerHTML = `Movimientos: ${movimientos}`;
+
+                Swal.fire({
+                    position: 'center',
+                    icon: 'success',
+                    title: 'Has Ganado',
+                    showConfirmButtom : true,
+                });
             }
         }else{
+            jump.play();
             //mostar los valores y taparlos
             setTimeout(()=>{
                 targetOne.innerHTML = '';
